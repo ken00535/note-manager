@@ -1,0 +1,6 @@
+.vscode
+bin
+config/*.json
+config/*.yaml
+log/*.log
+scripts/deploy.sh
