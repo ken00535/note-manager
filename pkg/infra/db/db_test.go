@@ -2,9 +2,10 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
-	"note-manager/pkg/config"
+	"note-manager/pkg/infra/config"
 	"note-manager/pkg/infra/logger"
 
 	"github.com/stretchr/testify/assert"
@@ -13,11 +14,34 @@ import (
 
 func TestConnect(t *testing.T) {
 	filter := bson.D{}
-	var result bson.D
+	type Note struct {
+		Content string
+		Comment string
+	}
+	var result []Note
 	log := logger.NewMockLogger()
 	config.Init(log)
 	Connect(log)
 	collection := client.Database("note").Collection("notes")
 	err := collection.FindOne(context.Background(), filter).Decode(&result)
+	fmt.Print(result)
+	assert.NoError(t, err)
+}
+
+func TestConnectFindAll(t *testing.T) {
+	filter := bson.D{}
+	type Note struct {
+		Content string
+		Comment string
+	}
+	var result []Note
+	log := logger.NewMockLogger()
+	config.Init(log)
+	Connect(log)
+	collection := client.Database("note").Collection("notes")
+	ctx := context.Background()
+	cursor, err := collection.Find(ctx, filter)
+	cursor.All(ctx, &result)
+	fmt.Print(result)
 	assert.NoError(t, err)
 }

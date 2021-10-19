@@ -3,7 +3,7 @@ package db
 import (
 	"context"
 	"fmt"
-	"note-manager/pkg/config"
+	"note-manager/pkg/infra/config"
 	"note-manager/pkg/infra/logger"
 	"time"
 
@@ -35,4 +35,9 @@ func Close() {
 	if err := client.Disconnect(context.Background()); err != nil {
 		log.Panic(err)
 	}
+}
+
+// NewClient new a db client
+func NewClient() *mongo.Client {
+	return client
 }

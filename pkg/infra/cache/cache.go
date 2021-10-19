@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"note-manager/pkg/config"
+	"note-manager/pkg/infra/config"
 	"sync"
 	"time"
 
