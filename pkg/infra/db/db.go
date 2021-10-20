@@ -7,7 +7,7 @@ import (
 	"note-manager/pkg/infra/logger"
 	"time"
 
-	_ "github.com/jinzhu/gorm/dialects/postgres" // import driver
+	"go.mongodb.org/mongo-driver/event"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -17,14 +17,19 @@ var (
 	log    logger.Logger
 )
 
-// Connect to DB with parameter written in config file
-func Connect(logInst logger.Logger) {
+// Init connect to DB with parameter written in config file
+func Init(logInst logger.Logger) {
 	log = logInst
+	cmdMonitor := &event.CommandMonitor{
+		Started: func(_ context.Context, evt *event.CommandStartedEvent) {
+			fmt.Print(evt.Command)
+		},
+	}
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	url := fmt.Sprintf("mongodb://%v:%v", config.GetDbAddress(), config.GetDbPort())
 	var err error
-	client, err = mongo.Connect(ctx, options.Client().ApplyURI(url))
+	client, err = mongo.Connect(ctx, options.Client().ApplyURI(url).SetMonitor(cmdMonitor))
 	if err != nil {
 		log.Panic(err)
 	}

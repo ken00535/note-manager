@@ -21,7 +21,7 @@ func TestConnect(t *testing.T) {
 	var result []Note
 	log := logger.NewMockLogger()
 	config.Init(log)
-	Connect(log)
+	Init(log)
 	collection := client.Database("note").Collection("notes")
 	err := collection.FindOne(context.Background(), filter).Decode(&result)
 	fmt.Print(result)
@@ -37,7 +37,7 @@ func TestConnectFindAll(t *testing.T) {
 	var result []Note
 	log := logger.NewMockLogger()
 	config.Init(log)
-	Connect(log)
+	Init(log)
 	collection := client.Database("note").Collection("notes")
 	ctx := context.Background()
 	cursor, err := collection.Find(ctx, filter)

@@ -13,7 +13,7 @@ import (
 func main() {
 	log := logger.New()
 	config.Init(log)
-	db.Connect(log)
+	db.Init(log)
 	r := route.NewRoute()
 	rg := r.Group("/")
 	repo := repository.NewNoteRepository()
