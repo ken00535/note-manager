@@ -24,6 +24,10 @@ func (u *noteUsecase) AddNotes(notes []note.Note) error {
 	return u.repo.AddNotes(notes)
 }
 
+func (u *noteUsecase) UpdateNote(n note.Note) error {
+	return u.repo.UpdateNote(n)
+}
+
 func (u *noteUsecase) DeleteNote(id string) error {
 	return u.repo.DeleteNote(id)
 }

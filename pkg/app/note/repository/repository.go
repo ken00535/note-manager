@@ -1,9 +1,9 @@
 package repository
 
 import (
-	"fmt"
 	"note-manager/pkg/domain/note"
 	"note-manager/pkg/infra/db"
+	"note-manager/pkg/infra/logger"
 
 	"context"
 
@@ -13,6 +13,7 @@ import (
 )
 
 var (
+	log    logger.Logger
 	client *mongo.Client
 )
 
@@ -20,6 +21,7 @@ type noteRepository struct{}
 
 // NewNoteRepository new a repository
 func NewNoteRepository() Repository {
+	log = logger.New()
 	client = db.NewClient()
 	return &noteRepository{}
 }
@@ -68,6 +70,29 @@ func (u *noteRepository) AddNotes(notes []note.Note) error {
 	collection := client.Database("note").Collection("notes")
 	_, err := collection.InsertMany(ctx, ds)
 	if err != nil {
+		log.Error(err)
+		return err
+	}
+	return nil
+}
+
+func (u *noteRepository) UpdateNote(n note.Note) error {
+	type Document struct {
+		ID      primitive.ObjectID `bson:"_id"`
+		Content string             `json:"content"`
+		Comment string             `json:"comment"`
+	}
+	ctx := context.Background()
+	idPrimitive, err := primitive.ObjectIDFromHex(n.ID)
+	d := Document{
+		ID:      idPrimitive,
+		Content: n.Content,
+		Comment: n.Comment,
+	}
+	collection := client.Database("note").Collection("notes")
+	_, err = collection.UpdateOne(ctx, bson.M{"_id": idPrimitive}, bson.M{"$set": d})
+	if err != nil {
+		log.Error(err)
 		return err
 	}
 	return nil
@@ -79,7 +104,7 @@ func (u *noteRepository) DeleteNote(id string) error {
 	collection := client.Database("note").Collection("notes")
 	_, err = collection.DeleteOne(ctx, bson.M{"_id": idPrimitive})
 	if err != nil {
-		fmt.Println()
+		log.Error(err)
 		return err
 	}
 	return nil

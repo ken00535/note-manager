@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"note-manager/pkg/infra/config"
 	"note-manager/pkg/infra/logger"
+	"sync"
 	"time"
 
 	"go.mongodb.org/mongo-driver/event"
@@ -15,14 +16,17 @@ import (
 var (
 	client *mongo.Client
 	log    logger.Logger
+	once   sync.Once
 )
 
 // Init connect to DB with parameter written in config file
 func Init(logInst logger.Logger) {
-	log = logInst
+	once.Do(func() {
+		log = logInst
+	})
 	cmdMonitor := &event.CommandMonitor{
 		Started: func(_ context.Context, evt *event.CommandStartedEvent) {
-			fmt.Print(evt.Command)
+			log.Info(evt.Command)
 		},
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)

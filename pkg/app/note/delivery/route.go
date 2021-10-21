@@ -31,6 +31,7 @@ func NewDeliveryHandler(r *gin.RouterGroup, us usecase.Usecase) {
 	}
 	r.GET("/api/notes", handler.getNotes)
 	r.POST("/api/notes", handler.postNotes)
+	r.PUT("/api/notes/:id", handler.putNote)
 	r.DELETE("/api/notes/:id", handler.deleteNote)
 }
 
@@ -72,6 +73,27 @@ func (h *Handler) postNotes(ctx *gin.Context) {
 		})
 	}
 	h.Usecase.AddNotes(notes)
+	ctx.JSON(http.StatusOK, nil)
+}
+
+func (h *Handler) putNote(ctx *gin.Context) {
+	type Request struct {
+		Content string `json:"content"`
+		Comment string `json:"comment"`
+	}
+	var req Request
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		log.Error(err)
+		ctx.JSON(http.StatusBadRequest, err)
+		return
+	}
+	noteID := ctx.Param("id")
+	n := note.Note{
+		ID:      noteID,
+		Content: req.Content,
+		Comment: req.Comment,
+	}
+	h.Usecase.UpdateNote(n)
 	ctx.JSON(http.StatusOK, nil)
 }
 
