@@ -26,7 +26,7 @@ func NewNoteRepository() Repository {
 	return &noteRepository{}
 }
 
-func (u *noteRepository) GetNotes() ([]note.Note, error) {
+func (u *noteRepository) GetNotes(kw string) ([]note.Note, error) {
 	type Document struct {
 		ID      primitive.ObjectID `bson:"_id"`
 		Content string             `json:"content"`
@@ -36,7 +36,7 @@ func (u *noteRepository) GetNotes() ([]note.Note, error) {
 	var notes []note.Note
 	ctx := context.Background()
 	collection := client.Database("note").Collection("notes")
-	cursor, err := collection.Find(ctx, bson.D{})
+	cursor, err := collection.Find(ctx, bson.M{"content": primitive.Regex{Pattern: kw, Options: ""}})
 	if err != nil {
 		return nil, err
 	}

@@ -41,7 +41,8 @@ func (h *Handler) getNotes(ctx *gin.Context) {
 		Content string `json:"content"`
 		Comment string `json:"comment"`
 	}
-	notes, _ := h.Usecase.GetNotes()
+	searchKw := ctx.Query("kw")
+	notes, _ := h.Usecase.GetNotes(searchKw)
 	var resp []Response
 	for _, n := range notes {
 		r := Response{

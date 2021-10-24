@@ -6,7 +6,7 @@ import (
 
 // Repository is repository
 type Repository interface {
-	GetNotes() ([]note.Note, error)
+	GetNotes(string) ([]note.Note, error)
 	AddNotes(notes []note.Note) error
 	UpdateNote(note.Note) error
 	DeleteNote(id string) error

@@ -16,8 +16,8 @@ func NewNoteUsecase(repo repository.Repository) Usecase {
 	}
 }
 
-func (u *noteUsecase) GetNotes() ([]note.Note, error) {
-	return u.repo.GetNotes()
+func (u *noteUsecase) GetNotes(kw string) ([]note.Note, error) {
+	return u.repo.GetNotes(kw)
 }
 
 func (u *noteUsecase) AddNotes(notes []note.Note) error {

@@ -4,7 +4,7 @@ import "note-manager/pkg/domain/note"
 
 // Usecase is usecase
 type Usecase interface {
-	GetNotes() ([]note.Note, error)
+	GetNotes(string) ([]note.Note, error)
 	AddNotes(notes []note.Note) error
 	UpdateNote(note.Note) error
 	DeleteNote(string) error
