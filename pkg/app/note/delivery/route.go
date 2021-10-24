@@ -2,6 +2,7 @@ package delivery
 
 import (
 	"net/http"
+	"strconv"
 	"sync"
 
 	"note-manager/pkg/app/note/usecase"
@@ -42,7 +43,9 @@ func (h *Handler) getNotes(ctx *gin.Context) {
 		Comment string `json:"comment"`
 	}
 	searchKw := ctx.Query("kw")
-	notes, _ := h.Usecase.GetNotes(searchKw)
+	pageStr := ctx.Query("page")
+	page, _ := strconv.Atoi(pageStr)
+	notes, _ := h.Usecase.GetNotes(searchKw, page)
 	var resp []Response
 	for _, n := range notes {
 		r := Response{

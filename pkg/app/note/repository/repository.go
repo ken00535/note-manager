@@ -10,6 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var (
@@ -26,7 +27,8 @@ func NewNoteRepository() Repository {
 	return &noteRepository{}
 }
 
-func (u *noteRepository) GetNotes(kw string) ([]note.Note, error) {
+func (u *noteRepository) GetNotes(kw string, page int) ([]note.Note, error) {
+	options := options.Find()
 	type Document struct {
 		ID      primitive.ObjectID `bson:"_id"`
 		Content string             `json:"content"`
@@ -36,7 +38,12 @@ func (u *noteRepository) GetNotes(kw string) ([]note.Note, error) {
 	var notes []note.Note
 	ctx := context.Background()
 	collection := client.Database("note").Collection("notes")
-	cursor, err := collection.Find(ctx, bson.M{"content": primitive.Regex{Pattern: kw, Options: ""}})
+	cursor, err := collection.Find(
+		ctx,
+		bson.M{"content": primitive.Regex{Pattern: kw, Options: ""}},
+		options.SetLimit(5),
+		options.SetSkip(int64(5*(page-1))),
+	)
 	if err != nil {
 		return nil, err
 	}
