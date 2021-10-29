@@ -56,3 +56,18 @@ func GetRdbPort() int {
 func GetRdbPassword() string {
 	return setting.GetString("rdb_password")
 }
+
+// GetUsername from config
+func GetUsername() string {
+	return setting.GetString("service_username")
+}
+
+// GetPassword from config
+func GetPassword() string {
+	return setting.GetString("service_password")
+}
+
+// GetSecret from config
+func GetSecret() string {
+	return setting.GetString("service_jwt_secert")
+}

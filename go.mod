@@ -16,6 +16,7 @@ require (
 	github.com/go-redis/redis/v8 v8.11.3
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/gocolly/colly v1.2.0
+	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/jinzhu/gorm v1.9.16
 	github.com/kennygrant/sanitize v1.2.4 // indirect
