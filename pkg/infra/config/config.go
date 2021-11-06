@@ -59,7 +59,7 @@ func GetRdbPassword() string {
 
 // GetUsername from config
 func GetUsername() string {
-	return setting.GetString("service_username")
+	return setting.GetString("service_account")
 }
 
 // GetPassword from config

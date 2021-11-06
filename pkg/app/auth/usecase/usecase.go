@@ -48,7 +48,7 @@ func (u *authUsecase) GetToken(username string) (string, error) {
 		},
 	}
 	tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	jwtSecret := config.GetSecret()
+	jwtSecret := []byte(config.GetSecret())
 	token, err := tokenClaims.SignedString(jwtSecret)
 	if err != nil {
 		return "", err
