@@ -35,7 +35,6 @@ func (Build) Win() error {
 // Docker build docker image and run as container
 func Docker() error {
 	sh.RunV("mage", strings.Split("build:linux", " ")...)
-	sh.RunV("docker", strings.Split("build -t 192.168.0.20:5500/ken00535/fin-monitor .", " ")...)
-	sh.RunV("docker", strings.Split("push 192.168.0.20:5500/ken00535/fin-monitor", " ")...)
+	sh.RunV("cmd", "/c", `scripts\build_image.bat`)
 	return nil
 }

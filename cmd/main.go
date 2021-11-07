@@ -1,6 +1,7 @@
 package main
 
 import (
+	"net/http"
 	_auth_delivery "note-manager/pkg/app/auth/delivery"
 	_auth_repository "note-manager/pkg/app/auth/repository"
 	_auth_usecase "note-manager/pkg/app/auth/usecase"
@@ -19,20 +20,23 @@ func main() {
 	log := logger.New()
 	config.Init(log)
 	db.Init(log)
-	r := route.NewRoute()
-	var validateAuthorization func(ctx *gin.Context)
-	rg := r.Group("/")
+	apiRoute := route.NewRoute()
+	apiRoute.LoadHTMLGlob("dist/note-manager/*.html")
+	apiRoute.Static("/static", "dist/note-manager")
+	apiRoute.GET("/", func(ctx *gin.Context) {
+		ctx.HTML(http.StatusOK, "index.html", nil)
+	})
+	apiRouteGroup := apiRoute.Group("/api")
 	{
 		repo := _auth_repository.NewAuthRepository()
 		us := _auth_usecase.NewAuthUsecase(repo)
-		deliver := _auth_delivery.NewAuthDelivery(rg, us)
-		validateAuthorization = deliver.ValidateAuthorization
+		deliver := _auth_delivery.NewAuthDelivery(apiRouteGroup, us)
+		apiRouteGroup.Use(deliver.ValidateAuthorization)
 	}
-	rg.Use(validateAuthorization)
 	{
 		repo := _note_repository.NewNoteRepository()
 		us := _note_usecase.NewNoteUsecase(repo)
-		_note_delivery.NewDeliveryHandler(rg, us)
+		_note_delivery.NewDeliveryHandler(apiRouteGroup, us)
 	}
-	r.Run(":9300")
+	apiRoute.Run(":9300")
 }

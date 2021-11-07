@@ -30,10 +30,10 @@ func NewDeliveryHandler(r *gin.RouterGroup, us usecase.Usecase) {
 	handler := Handler{
 		Usecase: us,
 	}
-	r.GET("/api/notes", handler.getNotes)
-	r.POST("/api/notes", handler.postNotes)
-	r.PUT("/api/notes/:id", handler.putNote)
-	r.DELETE("/api/notes/:id", handler.deleteNote)
+	r.GET("/notes", handler.getNotes)
+	r.POST("/notes", handler.postNotes)
+	r.PUT("/notes/:id", handler.putNote)
+	r.DELETE("/notes/:id", handler.deleteNote)
 }
 
 func (h *Handler) getNotes(ctx *gin.Context) {

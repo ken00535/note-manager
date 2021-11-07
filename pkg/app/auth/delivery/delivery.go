@@ -31,7 +31,7 @@ func NewAuthDelivery(r gin.IRouter, us usecase.Usecase) Delivery {
 		Router:  r,
 		usecase: us,
 	}
-	r.POST("/api/login", handler.postLogin)
+	r.POST("/login", handler.postLogin)
 	return handler
 }
 
