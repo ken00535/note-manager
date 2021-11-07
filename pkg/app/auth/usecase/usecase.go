@@ -58,7 +58,7 @@ func (u *authUsecase) GetToken(username string) (string, error) {
 
 func (u *authUsecase) ValidateToken(token string) error {
 	_, err := jwt.Parse(token, func(token *jwt.Token) (i interface{}, err error) {
-		return config.GetSecret(), nil
+		return []byte(config.GetSecret()), nil
 	})
 	if err != nil {
 		return err
