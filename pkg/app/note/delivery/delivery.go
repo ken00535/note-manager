@@ -46,7 +46,7 @@ func (h *Handler) getNotes(ctx *gin.Context) {
 	pageStr := ctx.Query("page")
 	page, _ := strconv.Atoi(pageStr)
 	notes, _ := h.Usecase.GetNotes(searchKw, page)
-	var resp []Response
+	resp := []Response{}
 	for _, n := range notes {
 		r := Response{
 			ID:      n.ID,

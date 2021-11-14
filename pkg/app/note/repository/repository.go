@@ -41,8 +41,8 @@ func (u *noteRepository) GetNotes(kw string, page int) ([]note.Note, error) {
 	cursor, err := collection.Find(
 		ctx,
 		bson.M{"content": primitive.Regex{Pattern: kw, Options: ""}},
-		options.SetLimit(5),
-		options.SetSkip(int64(5*(page-1))),
+		options.SetLimit(10),
+		options.SetSkip(int64(10*(page-1))),
 	)
 	if err != nil {
 		return nil, err
