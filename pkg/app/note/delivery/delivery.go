@@ -31,8 +31,8 @@ func NewDeliveryHandler(r *gin.RouterGroup, us usecase.Usecase) {
 		Usecase: us,
 	}
 	r.GET("/notes", handler.getNotes)
-	r.POST("/notes", handler.postNotes)
-	r.PUT("/notes/:id", handler.putNote)
+	r.POST("/notes", handler.addNote)
+	r.PUT("/notes/:id", handler.editNote)
 	r.DELETE("/notes/:id", handler.deleteNote)
 }
 
@@ -58,7 +58,7 @@ func (h *Handler) getNotes(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resp)
 }
 
-func (h *Handler) postNotes(ctx *gin.Context) {
+func (h *Handler) addNote(ctx *gin.Context) {
 	type Request struct {
 		Content string `json:"content"`
 		Comment string `json:"comment"`
@@ -80,7 +80,7 @@ func (h *Handler) postNotes(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, nil)
 }
 
-func (h *Handler) putNote(ctx *gin.Context) {
+func (h *Handler) editNote(ctx *gin.Context) {
 	type Request struct {
 		Content string `json:"content"`
 		Comment string `json:"comment"`

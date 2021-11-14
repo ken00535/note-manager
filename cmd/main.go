@@ -38,5 +38,6 @@ func main() {
 		us := _note_usecase.NewNoteUsecase(repo)
 		_note_delivery.NewDeliveryHandler(apiRouteGroup, us)
 	}
-	apiRoute.Run(":9300")
+	go apiRoute.Run(":9300")
+	apiRoute.RunTLS(":443", "./certs/server.crt", "./certs/server.key")
 }

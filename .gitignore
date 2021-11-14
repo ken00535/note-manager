@@ -6,3 +6,4 @@ log/*.log
 scripts/deploy.sh
 scripts/*
 dist/*
+certs/*
