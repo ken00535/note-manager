@@ -7,3 +7,6 @@ scripts/deploy.sh
 scripts/*
 dist/*
 certs/*
+!certs/.gitkeep
+!config/.gitkeep
+!scripts/.gitkeep
