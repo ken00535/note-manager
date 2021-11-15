@@ -52,13 +52,15 @@ func (h *Delivery) ValidateAuthorization(ctx *gin.Context) {
 
 func (h *Delivery) postLogin(ctx *gin.Context) {
 	type Request struct {
-		Username string `json:"username"`
-		Password string `json:"password"`
+		Username string `json:"username" binding:"alphanum"`
+		Password string `json:"password" binding:"alphanum"`
 	}
 	var req Request
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		log.Error(err)
-		ctx.JSON(http.StatusBadRequest, err)
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
 		return
 	}
 	// check account and password is correct

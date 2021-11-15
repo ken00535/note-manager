@@ -61,7 +61,8 @@ func (u *noteRepository) GetNotes(kw string, page int) ([]note.Note, error) {
 	return notes, nil
 }
 
-func (u *noteRepository) AddNotes(notes []note.Note) error {
+func (u *noteRepository) AddNotes(notes []note.Note) ([]string, error) {
+	var res []string
 	type Document struct {
 		Content string `json:"content"`
 		Comment string `json:"comment"`
@@ -75,12 +76,16 @@ func (u *noteRepository) AddNotes(notes []note.Note) error {
 	}
 	ctx := context.Background()
 	collection := client.Database("note").Collection("notes")
-	_, err := collection.InsertMany(ctx, ds)
+	result, err := collection.InsertMany(ctx, ds)
 	if err != nil {
 		log.Error(err)
-		return err
+		return res, err
 	}
-	return nil
+	for _, id := range result.InsertedIDs {
+		oid := id.(primitive.ObjectID)
+		res = append(res, oid.Hex())
+	}
+	return res, nil
 }
 
 func (u *noteRepository) UpdateNote(n note.Note) error {

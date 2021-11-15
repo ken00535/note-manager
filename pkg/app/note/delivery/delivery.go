@@ -38,8 +38,8 @@ func NewDeliveryHandler(r *gin.RouterGroup, us usecase.Usecase) {
 
 func (h *Handler) getNotes(ctx *gin.Context) {
 	type Response struct {
-		ID      string `json:"id"`
-		Content string `json:"content"`
+		ID      string `json:"id" binding:"alphanum"`
+		Content string `json:"content" binding:"required"`
 		Comment string `json:"comment"`
 	}
 	searchKw := ctx.Query("kw")
@@ -60,7 +60,7 @@ func (h *Handler) getNotes(ctx *gin.Context) {
 
 func (h *Handler) addNote(ctx *gin.Context) {
 	type Request struct {
-		Content string `json:"content"`
+		Content string `json:"content" binding:"required"`
 		Comment string `json:"comment"`
 	}
 	var reqs []Request
@@ -76,13 +76,17 @@ func (h *Handler) addNote(ctx *gin.Context) {
 			Comment: r.Comment,
 		})
 	}
-	h.Usecase.AddNotes(notes)
-	ctx.JSON(http.StatusOK, nil)
+	ids, _ := h.Usecase.AddNotes(notes)
+	type Response struct {
+		ID string `json:"id"`
+	}
+	res := Response{ID: ids[0]}
+	ctx.JSON(http.StatusOK, res)
 }
 
 func (h *Handler) editNote(ctx *gin.Context) {
 	type Request struct {
-		Content string `json:"content"`
+		Content string `json:"content" binding:"required"`
 		Comment string `json:"comment"`
 	}
 	var req Request

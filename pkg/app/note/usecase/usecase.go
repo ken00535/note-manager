@@ -20,7 +20,7 @@ func (u *noteUsecase) GetNotes(kw string, page int) ([]note.Note, error) {
 	return u.repo.GetNotes(kw, page)
 }
 
-func (u *noteUsecase) AddNotes(notes []note.Note) error {
+func (u *noteUsecase) AddNotes(notes []note.Note) ([]string, error) {
 	return u.repo.AddNotes(notes)
 }
 
