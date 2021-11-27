@@ -17,12 +17,14 @@ var (
 	client *mongo.Client
 	log    logger.Logger
 	once   sync.Once
+	c      config.Config
 )
 
 // Init connect to DB with parameter written in config file
 func Init(logInst logger.Logger) {
 	once.Do(func() {
 		log = logInst
+		c = config.Init()
 	})
 	cmdMonitor := &event.CommandMonitor{
 		Started: func(_ context.Context, evt *event.CommandStartedEvent) {
@@ -31,7 +33,7 @@ func Init(logInst logger.Logger) {
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	url := fmt.Sprintf("mongodb://%v:%v", config.GetDbAddress(), config.GetDbPort())
+	url := fmt.Sprintf("mongodb://%v:%v", c.GetDbAddress(), c.GetDbPort())
 	var err error
 	client, err = mongo.Connect(ctx, options.Client().ApplyURI(url).SetMonitor(cmdMonitor))
 	if err != nil {

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"testing"
 
-	"note-manager/pkg/infra/config"
 	"note-manager/pkg/infra/logger"
 
 	"github.com/stretchr/testify/assert"
@@ -18,10 +17,8 @@ func TestConnect(t *testing.T) {
 		Content string
 		Comment string
 	}
-	var result []Note
-	log := logger.NewMockLogger()
-	config.Init(log)
-	Init(log)
+	var result Note
+	Init(logger.NewMockLogger())
 	collection := client.Database("note").Collection("notes")
 	err := collection.FindOne(context.Background(), filter).Decode(&result)
 	fmt.Print(result)
@@ -35,9 +32,7 @@ func TestConnectFindAll(t *testing.T) {
 		Comment string
 	}
 	var result []Note
-	log := logger.NewMockLogger()
-	config.Init(log)
-	Init(log)
+	Init(logger.NewMockLogger())
 	collection := client.Database("note").Collection("notes")
 	ctx := context.Background()
 	cursor, err := collection.Find(ctx, filter)

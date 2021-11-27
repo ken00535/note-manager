@@ -4,9 +4,15 @@ import (
 	"fmt"
 	"note-manager/pkg/infra/config"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/golang-jwt/jwt"
+)
+
+var (
+	cfg  config.Config
+	once sync.Once
 )
 
 type Claims struct {
@@ -20,14 +26,17 @@ type authUsecase struct {
 
 // NewAuthUsecase will create new usecase
 func NewAuthUsecase(repo Repository) Usecase {
+	once.Do(func() {
+		cfg = config.Init()
+	})
 	return &authUsecase{
 		repo: repo,
 	}
 }
 
 func (u *authUsecase) ValidateUser(username, password string) error {
-	trueUsername := config.GetUsername()
-	truePassword := config.GetPassword()
+	trueUsername := cfg.GetUsername()
+	truePassword := cfg.GetPassword()
 	if username == trueUsername && password == truePassword {
 		return nil
 	}
@@ -48,7 +57,7 @@ func (u *authUsecase) GetToken(username string) (string, error) {
 		},
 	}
 	tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	jwtSecret := []byte(config.GetSecret())
+	jwtSecret := []byte(cfg.GetSecret())
 	token, err := tokenClaims.SignedString(jwtSecret)
 	if err != nil {
 		return "", err
@@ -58,7 +67,7 @@ func (u *authUsecase) GetToken(username string) (string, error) {
 
 func (u *authUsecase) ValidateToken(token string) error {
 	_, err := jwt.Parse(token, func(token *jwt.Token) (i interface{}, err error) {
-		return []byte(config.GetSecret()), nil
+		return []byte(cfg.GetSecret()), nil
 	})
 	if err != nil {
 		return err

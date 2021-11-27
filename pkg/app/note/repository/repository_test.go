@@ -9,14 +9,14 @@ import (
 )
 
 func Test_noteRepository_GetNotes(t *testing.T) {
-	config.Init(logger.NewMockLogger())
+	config.Init()
 	db.Init(logger.NewMockLogger())
 	repo := NewNoteRepository()
 	repo.GetNotes("", 2)
 }
 
 func Test_noteRepository_AddNotes(t *testing.T) {
-	config.Init(logger.NewMockLogger())
+	config.Init()
 	db.Init(logger.NewMockLogger())
 	repo := NewNoteRepository()
 	notes := []note.Note{

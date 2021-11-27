@@ -18,7 +18,7 @@ import (
 
 func main() {
 	log := logger.New()
-	config.Init(log)
+	config.Init()
 	db.Init(log)
 	apiRoute := route.NewRoute()
 	apiRoute.LoadHTMLGlob("dist/note-manager/*.html")

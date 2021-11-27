@@ -15,6 +15,7 @@ var (
 	once sync.Once
 	rdb  *redis.Client
 	ctx  context.Context
+	cfg  config.Config
 )
 
 // Cache is handler of cache
@@ -25,10 +26,10 @@ type Cache struct {
 // NewCache new a cache
 func NewCache() *Cache {
 	once.Do(func() {
-		address := fmt.Sprintf("%v:%v", config.GetRdbAdress(), config.GetRdbPort())
+		address := fmt.Sprintf("%v:%v", cfg.GetRdbAdress(), cfg.GetRdbPort())
 		rdb = redis.NewClient(&redis.Options{
 			Addr:     address,
-			Password: config.GetRdbPassword(),
+			Password: cfg.GetRdbPassword(),
 			DB:       0, // use default DB
 		})
 		ctx = context.Background()
