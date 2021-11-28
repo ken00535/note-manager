@@ -4,6 +4,7 @@ import (
 	"note-manager/pkg/domain/note"
 	"note-manager/pkg/infra/db"
 	"note-manager/pkg/infra/logger"
+	"time"
 
 	"context"
 
@@ -38,6 +39,7 @@ func (u *noteRepository) GetNotes(kw string, page int) ([]note.Note, error) {
 	var notes []note.Note
 	ctx := context.Background()
 	collection := client.Database("note").Collection("notes")
+	log.Info("start: ", time.Now())
 	cursor, err := collection.Find(
 		ctx,
 		bson.M{"content": primitive.Regex{Pattern: kw, Options: ""}},
@@ -51,6 +53,7 @@ func (u *noteRepository) GetNotes(kw string, page int) ([]note.Note, error) {
 	if err != nil {
 		return nil, err
 	}
+	log.Info("end: ", time.Now())
 	for _, d := range docs {
 		notes = append(notes, note.Note{
 			ID:      d.ID.Hex(),

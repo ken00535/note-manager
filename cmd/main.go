@@ -12,6 +12,7 @@ import (
 	"note-manager/pkg/infra/db"
 	route "note-manager/pkg/infra/http"
 	"note-manager/pkg/infra/logger"
+	"sync"
 
 	"github.com/gin-gonic/gin"
 )
@@ -23,6 +24,7 @@ func main() {
 	apiRoute := route.NewRoute()
 	apiRoute.LoadHTMLGlob("dist/note-manager/*.html")
 	apiRoute.Static("/static", "dist/note-manager")
+	apiRoute.Use(gin.Logger())
 	apiRoute.GET("/", func(ctx *gin.Context) {
 		ctx.HTML(http.StatusOK, "index.html", nil)
 	})
@@ -38,6 +40,15 @@ func main() {
 		us := _note_usecase.NewNoteUsecase(repo)
 		_note_delivery.NewDeliveryHandler(apiRouteGroup, us)
 	}
-	go apiRoute.Run(":9300")
-	apiRoute.RunTLS(":443", "./certs/server.crt", "./certs/server.key")
+	var wg sync.WaitGroup
+	wg.Add(2)
+	go func() {
+		apiRoute.Run(":9300")
+		wg.Done()
+	}()
+	go func() {
+		apiRoute.RunTLS(":443", "./certs/server.crt", "./certs/server.key")
+		wg.Done()
+	}()
+	wg.Wait()
 }

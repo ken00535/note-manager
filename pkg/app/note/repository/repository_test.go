@@ -12,7 +12,7 @@ func Test_noteRepository_GetNotes(t *testing.T) {
 	config.Init()
 	db.Init(logger.NewMockLogger())
 	repo := NewNoteRepository()
-	repo.GetNotes("", 2)
+	repo.GetNotes("李維", 1)
 }
 
 func Test_noteRepository_AddNotes(t *testing.T) {
