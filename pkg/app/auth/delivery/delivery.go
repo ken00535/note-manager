@@ -18,20 +18,17 @@ var (
 
 // Delivery is delivery handler
 type Delivery struct {
-	Router  gin.IRouter
 	usecase usecase.Usecase
 }
 
 // NewAuthDelivery new a delivery
-func NewAuthDelivery(r gin.IRouter, us usecase.Usecase) Delivery {
+func NewAuthDelivery(us usecase.Usecase) Delivery {
 	once.Do(func() {
 		log = logger.New()
 	})
 	handler := Delivery{
-		Router:  r,
 		usecase: us,
 	}
-	r.POST("/login", handler.postLogin)
 	return handler
 }
 
@@ -39,7 +36,22 @@ func NewAuthDelivery(r gin.IRouter, us usecase.Usecase) Delivery {
 func (h *Delivery) ValidateAuthorization(ctx *gin.Context) {
 	auth := ctx.GetHeader("Authorization")
 	token := strings.Split(auth, "Bearer ")[1]
-	err := h.usecase.ValidateToken(token)
+	username, err := h.usecase.ValidateToken(token)
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"error": err.Error(),
+		})
+		ctx.Abort()
+		return
+	}
+	ctx.Set("username", username)
+	ctx.Next()
+}
+
+// ValidatePermission validate permission
+func (h *Delivery) ValidatePermission(ctx *gin.Context) {
+	username := ctx.GetString("username")
+	err := h.usecase.ValidatePermission(username)
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, gin.H{
 			"error": err.Error(),
@@ -50,7 +62,8 @@ func (h *Delivery) ValidateAuthorization(ctx *gin.Context) {
 	ctx.Next()
 }
 
-func (h *Delivery) postLogin(ctx *gin.Context) {
+// Login login to service
+func (h *Delivery) Login(ctx *gin.Context) {
 	type Request struct {
 		Username string `json:"username" binding:"alphanum"`
 		Password string `json:"password" binding:"alphanum"`

@@ -14,6 +14,6 @@ func Test_ValidateToken(t *testing.T) {
 	u := NewAuthUsecase(Repo{})
 	token, err := u.GetToken("ken")
 	assert.NoError(t, err)
-	err = u.ValidateToken(token)
+	_, err = u.ValidateToken(token)
 	assert.NoError(t, err)
 }

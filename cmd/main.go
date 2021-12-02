@@ -29,16 +29,23 @@ func main() {
 		ctx.HTML(http.StatusOK, "index.html", nil)
 	})
 	apiRouteGroup := apiRoute.Group("/api")
+	var authDeliver _auth_delivery.Delivery
 	{
 		repo := _auth_repository.NewAuthRepository()
 		us := _auth_usecase.NewAuthUsecase(repo)
-		deliver := _auth_delivery.NewAuthDelivery(apiRouteGroup, us)
-		apiRouteGroup.Use(deliver.ValidateAuthorization)
+		authDeliver = _auth_delivery.NewAuthDelivery(us)
+		apiRouteGroup.POST("/login", authDeliver.Login)
+		apiRouteGroup.Use(authDeliver.ValidateAuthorization)
 	}
 	{
 		repo := _note_repository.NewNoteRepository()
 		us := _note_usecase.NewNoteUsecase(repo)
-		_note_delivery.NewDeliveryHandler(apiRouteGroup, us)
+		deliver := _note_delivery.NewDeliveryHandler(us)
+		apiRouteGroup.GET("/notes", deliver.GetNotes)
+		apiRouteGroup.Use(authDeliver.ValidatePermission)
+		apiRouteGroup.POST("/notes", deliver.AddNote)
+		apiRouteGroup.PUT("/notes/:id", deliver.EditNote)
+		apiRouteGroup.DELETE("/notes/:id", deliver.DeleteNote)
 	}
 	var wg sync.WaitGroup
 	wg.Add(2)

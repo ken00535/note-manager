@@ -23,20 +23,17 @@ type Handler struct {
 }
 
 // NewDeliveryHandler new a delivery
-func NewDeliveryHandler(r *gin.RouterGroup, us usecase.Usecase) {
+func NewDeliveryHandler(us usecase.Usecase) Handler {
 	once.Do(func() {
 		log = logger.New()
 	})
 	handler := Handler{
 		Usecase: us,
 	}
-	r.GET("/notes", handler.getNotes)
-	r.POST("/notes", handler.addNote)
-	r.PUT("/notes/:id", handler.editNote)
-	r.DELETE("/notes/:id", handler.deleteNote)
+	return handler
 }
 
-func (h *Handler) getNotes(ctx *gin.Context) {
+func (h *Handler) GetNotes(ctx *gin.Context) {
 	type Response struct {
 		ID      string `json:"id" binding:"alphanum"`
 		Content string `json:"content" binding:"required"`
@@ -58,7 +55,7 @@ func (h *Handler) getNotes(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resp)
 }
 
-func (h *Handler) addNote(ctx *gin.Context) {
+func (h *Handler) AddNote(ctx *gin.Context) {
 	type Request struct {
 		Content string `json:"content" binding:"required"`
 		Comment string `json:"comment"`
@@ -84,7 +81,7 @@ func (h *Handler) addNote(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
-func (h *Handler) editNote(ctx *gin.Context) {
+func (h *Handler) EditNote(ctx *gin.Context) {
 	type Request struct {
 		Content string `json:"content" binding:"required"`
 		Comment string `json:"comment"`
@@ -105,7 +102,7 @@ func (h *Handler) editNote(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, nil)
 }
 
-func (h *Handler) deleteNote(ctx *gin.Context) {
+func (h *Handler) DeleteNote(ctx *gin.Context) {
 	noteID := ctx.Param("id")
 	h.Usecase.DeleteNote(noteID)
 	ctx.JSON(http.StatusOK, nil)

@@ -63,13 +63,13 @@ func (*config) GetRdbPassword() string {
 }
 
 // GetUsername from config
-func (*config) GetUsername() string {
-	return setting.GetString("service_account")
+func (*config) GetUsername() []string {
+	return setting.GetStringSlice("service_account")
 }
 
 // GetPassword from config
-func (*config) GetPassword() string {
-	return setting.GetString("service_password")
+func (*config) GetPassword() []string {
+	return setting.GetStringSlice("service_password")
 }
 
 // GetSecret from config

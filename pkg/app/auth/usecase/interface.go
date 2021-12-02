@@ -4,7 +4,8 @@ package usecase
 type Usecase interface {
 	GetToken(username string) (string, error)
 	ValidateUser(username, password string) error
-	ValidateToken(token string) error
+	ValidateToken(token string) (string, error)
+	ValidatePermission(username string) error
 }
 
 // Repository is repository

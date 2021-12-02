@@ -7,7 +7,7 @@ type Config interface {
 	GetRdbAdress() string
 	GetRdbPort() int
 	GetRdbPassword() string
-	GetUsername() string
-	GetPassword() string
+	GetUsername() []string
+	GetPassword() []string
 	GetSecret() string
 }

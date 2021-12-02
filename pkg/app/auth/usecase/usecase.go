@@ -35,10 +35,12 @@ func NewAuthUsecase(repo Repository) Usecase {
 }
 
 func (u *authUsecase) ValidateUser(username, password string) error {
-	trueUsername := cfg.GetUsername()
-	truePassword := cfg.GetPassword()
-	if username == trueUsername && password == truePassword {
-		return nil
+	trueUsernames := cfg.GetUsername()
+	truePasswords := cfg.GetPassword()
+	for i := range trueUsernames {
+		if username == trueUsernames[i] && password == truePasswords[i] {
+			return nil
+		}
 	}
 	return fmt.Errorf("invalid username or password")
 }
@@ -65,12 +67,20 @@ func (u *authUsecase) GetToken(username string) (string, error) {
 	return token, nil
 }
 
-func (u *authUsecase) ValidateToken(token string) error {
-	_, err := jwt.Parse(token, func(token *jwt.Token) (i interface{}, err error) {
+func (u *authUsecase) ValidateToken(token string) (string, error) {
+	jwtToken, err := jwt.Parse(token, func(token *jwt.Token) (i interface{}, err error) {
 		return []byte(cfg.GetSecret()), nil
 	})
 	if err != nil {
-		return err
+		return "", err
+	}
+	claims := jwtToken.Claims.(jwt.MapClaims)
+	return claims["username"].(string), nil
+}
+
+func (u *authUsecase) ValidatePermission(username string) error {
+	if username != "ken" {
+		return fmt.Errorf("has no permission")
 	}
 	return nil
 }
