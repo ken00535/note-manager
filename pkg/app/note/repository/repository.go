@@ -28,21 +28,26 @@ func NewNoteRepository() Repository {
 	return &noteRepository{}
 }
 
-func (u *noteRepository) GetNotes(kw string, page int) ([]note.Note, error) {
+func (u *noteRepository) GetNotes(kw string, tag string, page int) ([]note.Note, error) {
 	options := options.Find()
 	type Document struct {
 		ID      primitive.ObjectID `bson:"_id"`
 		Content string             `json:"content"`
 		Comment string             `json:"comment"`
+		Tags    []string           `json:"tags"`
 	}
 	var docs []Document
 	var notes []note.Note
 	ctx := context.Background()
 	collection := client.Database("note").Collection("notes")
 	log.Info("start: ", time.Now())
+	filter := bson.M{"content": primitive.Regex{Pattern: kw, Options: ""}}
+	if tag != "" {
+		filter["tags"] = bson.M{"$in": []string{tag}}
+	}
 	cursor, err := collection.Find(
 		ctx,
-		bson.M{"content": primitive.Regex{Pattern: kw, Options: ""}},
+		filter,
 		options.SetLimit(10),
 		options.SetSkip(int64(10*(page-1))),
 	)
@@ -59,6 +64,7 @@ func (u *noteRepository) GetNotes(kw string, page int) ([]note.Note, error) {
 			ID:      d.ID.Hex(),
 			Content: d.Content,
 			Comment: d.Comment,
+			Tags:    d.Tags,
 		})
 	}
 	return notes, nil

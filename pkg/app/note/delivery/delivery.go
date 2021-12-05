@@ -33,28 +33,37 @@ func NewDeliveryHandler(us usecase.Usecase) Handler {
 	return handler
 }
 
+// GetNotes get notes
 func (h *Handler) GetNotes(ctx *gin.Context) {
 	type Response struct {
-		ID      string `json:"id" binding:"alphanum"`
-		Content string `json:"content" binding:"required"`
-		Comment string `json:"comment"`
+		ID      string   `json:"id" binding:"alphanum"`
+		Content string   `json:"content" binding:"required"`
+		Comment string   `json:"comment"`
+		Tags    []string `json:"tags"`
 	}
 	searchKw := ctx.Query("kw")
+	tag := ctx.Query("tag")
 	pageStr := ctx.Query("page")
 	page, _ := strconv.Atoi(pageStr)
-	notes, _ := h.Usecase.GetNotes(searchKw, page)
+	notes, err := h.Usecase.GetNotes(searchKw, tag, page)
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 	resp := []Response{}
 	for _, n := range notes {
 		r := Response{
 			ID:      n.ID,
 			Content: n.Content,
 			Comment: n.Comment,
+			Tags:    n.Tags,
 		}
 		resp = append(resp, r)
 	}
 	ctx.JSON(http.StatusOK, resp)
 }
 
+// AddNote add note to db
 func (h *Handler) AddNote(ctx *gin.Context) {
 	type Request struct {
 		Content string `json:"content" binding:"required"`
@@ -81,6 +90,7 @@ func (h *Handler) AddNote(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
+// EditNote edit note
 func (h *Handler) EditNote(ctx *gin.Context) {
 	type Request struct {
 		Content string `json:"content" binding:"required"`
@@ -102,6 +112,7 @@ func (h *Handler) EditNote(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, nil)
 }
 
+// DeleteNote delete note
 func (h *Handler) DeleteNote(ctx *gin.Context) {
 	noteID := ctx.Param("id")
 	h.Usecase.DeleteNote(noteID)

@@ -5,4 +5,5 @@ type Note struct {
 	ID      string
 	Content string
 	Comment string
+	Tags    []string
 }

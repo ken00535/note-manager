@@ -79,7 +79,7 @@ func (u *authUsecase) ValidateToken(token string) (string, error) {
 }
 
 func (u *authUsecase) ValidatePermission(username string) error {
-	if username != "ken" {
+	if username != "admin" {
 		return fmt.Errorf("has no permission")
 	}
 	return nil
