@@ -52,6 +52,9 @@ func (h *Handler) GetNotes(ctx *gin.Context) {
 	}
 	resp := []Response{}
 	for _, n := range notes {
+		if n.Tags == nil {
+			n.Tags = []string{}
+		}
 		r := Response{
 			ID:      n.ID,
 			Content: n.Content,
@@ -66,8 +69,9 @@ func (h *Handler) GetNotes(ctx *gin.Context) {
 // AddNote add note to db
 func (h *Handler) AddNote(ctx *gin.Context) {
 	type Request struct {
-		Content string `json:"content" binding:"required"`
-		Comment string `json:"comment"`
+		Content string   `json:"content" binding:"required"`
+		Comment string   `json:"comment"`
+		Tags    []string `json:"tags"`
 	}
 	var reqs []Request
 	if err := ctx.ShouldBindJSON(&reqs); err != nil {
@@ -80,6 +84,7 @@ func (h *Handler) AddNote(ctx *gin.Context) {
 		notes = append(notes, note.Note{
 			Content: r.Content,
 			Comment: r.Comment,
+			Tags:    r.Tags,
 		})
 	}
 	ids, _ := h.Usecase.AddNotes(notes)
@@ -93,8 +98,9 @@ func (h *Handler) AddNote(ctx *gin.Context) {
 // EditNote edit note
 func (h *Handler) EditNote(ctx *gin.Context) {
 	type Request struct {
-		Content string `json:"content" binding:"required"`
-		Comment string `json:"comment"`
+		Content string   `json:"content" binding:"required"`
+		Comment string   `json:"comment"`
+		Tags    []string `json:"tags"`
 	}
 	var req Request
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -107,6 +113,7 @@ func (h *Handler) EditNote(ctx *gin.Context) {
 		ID:      noteID,
 		Content: req.Content,
 		Comment: req.Comment,
+		Tags:    req.Tags,
 	}
 	h.Usecase.UpdateNote(n)
 	ctx.JSON(http.StatusOK, nil)

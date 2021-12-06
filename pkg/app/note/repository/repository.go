@@ -73,14 +73,16 @@ func (u *noteRepository) GetNotes(kw string, tag string, page int) ([]note.Note,
 func (u *noteRepository) AddNotes(notes []note.Note) ([]string, error) {
 	var res []string
 	type Document struct {
-		Content string `json:"content"`
-		Comment string `json:"comment"`
+		Content string   `json:"content"`
+		Comment string   `json:"comment"`
+		Tags    []string `json:"tags"`
 	}
 	var ds []interface{}
 	for _, n := range notes {
 		ds = append(ds, Document{
 			Content: n.Content,
 			Comment: n.Comment,
+			Tags:    n.Tags,
 		})
 	}
 	ctx := context.Background()
@@ -102,6 +104,7 @@ func (u *noteRepository) UpdateNote(n note.Note) error {
 		ID      primitive.ObjectID `bson:"_id"`
 		Content string             `json:"content"`
 		Comment string             `json:"comment"`
+		Tags    []string           `json:"tags"`
 	}
 	ctx := context.Background()
 	idPrimitive, err := primitive.ObjectIDFromHex(n.ID)
@@ -109,6 +112,7 @@ func (u *noteRepository) UpdateNote(n note.Note) error {
 		ID:      idPrimitive,
 		Content: n.Content,
 		Comment: n.Comment,
+		Tags:    n.Tags,
 	}
 	collection := client.Database("note").Collection("notes")
 	_, err = collection.UpdateOne(ctx, bson.M{"_id": idPrimitive}, bson.M{"$set": d})
