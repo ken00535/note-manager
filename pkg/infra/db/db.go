@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"note-manager/pkg/infra/config"
 	"note-manager/pkg/infra/logger"
@@ -33,9 +34,23 @@ func Init(logInst logger.Logger) {
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	url := fmt.Sprintf("mongodb://%v:%v", c.GetDbAddress(), c.GetDbPort())
+	opt := c.GetDbOption()
+	url := fmt.Sprintf("mongodb://%v:%v", opt.Address, opt.Port)
+	auth := options.Credential{
+		AuthMechanism: opt.Mechanism,
+		Username:      opt.Username,
+		Password:      opt.Password,
+	}
+	tlsCfg := &tls.Config{
+		InsecureSkipVerify: true,
+	}
 	var err error
-	client, err = mongo.Connect(ctx, options.Client().ApplyURI(url).SetMonitor(cmdMonitor))
+	clientOpt := options.Client().
+		ApplyURI(url).
+		SetMonitor(cmdMonitor).
+		SetAuth(auth).
+		SetTLSConfig(tlsCfg)
+	client, err = mongo.Connect(ctx, clientOpt)
 	if err != nil {
 		log.Panic(err)
 	}

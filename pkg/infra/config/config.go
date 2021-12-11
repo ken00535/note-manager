@@ -38,13 +38,14 @@ func Init() Config {
 }
 
 // GetDbAddress from config
-func (*config) GetDbAddress() string {
-	return setting.GetString("server_address")
-}
-
-// GetDbPort from config
-func (*config) GetDbPort() int {
-	return setting.GetInt("server_port")
+func (*config) GetDbOption() DbOption {
+	opt := DbOption{}
+	opt.Address = setting.GetString("mongo_address")
+	opt.Password = setting.GetString("mongo_password")
+	opt.Port = setting.GetInt("mongo_port")
+	opt.Username = setting.GetString("mongo_username")
+	opt.Mechanism = setting.GetString("mongo_mechanism")
+	return opt
 }
 
 // GetRdbAdress from config
