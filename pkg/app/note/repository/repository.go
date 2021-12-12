@@ -31,10 +31,12 @@ func NewNoteRepository() Repository {
 func (u *noteRepository) GetNotes(kw string, tag string, page int) ([]note.Note, error) {
 	options := options.Find()
 	type Document struct {
-		ID      primitive.ObjectID `bson:"_id"`
-		Content string             `json:"content"`
-		Comment string             `json:"comment"`
-		Tags    []string           `json:"tags"`
+		ID        primitive.ObjectID `bson:"_id"`
+		Content   string             `bson:"content"`
+		Comment   string             `bson:"comment"`
+		CreatedAt string             `bson:"created_at"`
+		EditedAt  string             `bson:"edited_at"`
+		Tags      []string           `bson:"tags"`
 	}
 	var docs []Document
 	var notes []note.Note
@@ -48,6 +50,7 @@ func (u *noteRepository) GetNotes(kw string, tag string, page int) ([]note.Note,
 	cursor, err := collection.Find(
 		ctx,
 		filter,
+		options.SetSort(bson.M{"edited_at": -1}),
 		options.SetLimit(10),
 		options.SetSkip(int64(10*(page-1))),
 	)
@@ -60,11 +63,15 @@ func (u *noteRepository) GetNotes(kw string, tag string, page int) ([]note.Note,
 	}
 	log.Info("end: ", time.Now())
 	for _, d := range docs {
+		created, _ := time.Parse(time.RFC3339, d.CreatedAt)
+		edited, _ := time.Parse(time.RFC3339, d.CreatedAt)
 		notes = append(notes, note.Note{
-			ID:      d.ID.Hex(),
-			Content: d.Content,
-			Comment: d.Comment,
-			Tags:    d.Tags,
+			ID:        d.ID.Hex(),
+			Content:   d.Content,
+			Comment:   d.Comment,
+			CreatedAt: created,
+			EditedAt:  edited,
+			Tags:      d.Tags,
 		})
 	}
 	return notes, nil
@@ -73,16 +80,20 @@ func (u *noteRepository) GetNotes(kw string, tag string, page int) ([]note.Note,
 func (u *noteRepository) AddNotes(notes []note.Note) ([]string, error) {
 	var res []string
 	type Document struct {
-		Content string   `json:"content"`
-		Comment string   `json:"comment"`
-		Tags    []string `json:"tags"`
+		Content   string   `bson:"content"`
+		Comment   string   `bson:"comment"`
+		CreatedAt string   `bson:"created_at"`
+		EditedAt  string   `bson:"edited_at"`
+		Tags      []string `bson:"tags"`
 	}
 	var ds []interface{}
 	for _, n := range notes {
 		ds = append(ds, Document{
-			Content: n.Content,
-			Comment: n.Comment,
-			Tags:    n.Tags,
+			Content:   n.Content,
+			Comment:   n.Comment,
+			CreatedAt: time.Now().Format(time.RFC3339),
+			EditedAt:  time.Now().Format(time.RFC3339),
+			Tags:      n.Tags,
 		})
 	}
 	ctx := context.Background()
@@ -101,18 +112,20 @@ func (u *noteRepository) AddNotes(notes []note.Note) ([]string, error) {
 
 func (u *noteRepository) UpdateNote(n note.Note) error {
 	type Document struct {
-		ID      primitive.ObjectID `bson:"_id"`
-		Content string             `json:"content"`
-		Comment string             `json:"comment"`
-		Tags    []string           `json:"tags"`
+		ID       primitive.ObjectID `bson:"_id"`
+		Content  string             `bson:"content"`
+		Comment  string             `bson:"comment"`
+		EditedAt string             `bson:"edited_at"`
+		Tags     []string           `bson:"tags"`
 	}
 	ctx := context.Background()
 	idPrimitive, err := primitive.ObjectIDFromHex(n.ID)
 	d := Document{
-		ID:      idPrimitive,
-		Content: n.Content,
-		Comment: n.Comment,
-		Tags:    n.Tags,
+		ID:       idPrimitive,
+		Content:  n.Content,
+		Comment:  n.Comment,
+		EditedAt: time.Now().Format(time.RFC3339),
+		Tags:     n.Tags,
 	}
 	collection := client.Database("note").Collection("notes")
 	_, err = collection.UpdateOne(ctx, bson.M{"_id": idPrimitive}, bson.M{"$set": d})
