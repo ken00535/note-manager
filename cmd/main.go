@@ -42,11 +42,11 @@ func main() {
 		us := _note_usecase.NewNoteUsecase(repo)
 		deliver := _note_delivery.NewDeliveryHandler(us)
 		apiRouteGroup.GET("/notes", deliver.GetNotes)
+		apiRouteGroup.GET("/tags", deliver.GetTags)
 		apiRouteGroup.Use(authDeliver.ValidatePermission)
 		apiRouteGroup.POST("/notes", deliver.AddNote)
 		apiRouteGroup.PUT("/notes/:id", deliver.EditNote)
 		apiRouteGroup.DELETE("/notes/:id", deliver.DeleteNote)
-		apiRouteGroup.GET("/tags", deliver.GetTags)
 	}
 	var wg sync.WaitGroup
 	wg.Add(2)

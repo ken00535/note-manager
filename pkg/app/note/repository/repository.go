@@ -2,7 +2,6 @@ package repository
 
 import (
 	"note-manager/pkg/app/note/entity"
-	"note-manager/pkg/domain/note"
 	"note-manager/pkg/infra/db"
 	"note-manager/pkg/infra/logger"
 	"time"
@@ -29,7 +28,7 @@ func NewNoteRepository() Repository {
 	return &noteRepository{}
 }
 
-func (u *noteRepository) GetNotes(kw string, tag string, page int) ([]note.Note, error) {
+func (u *noteRepository) GetNotes(kw string, tag string, page int) ([]entity.Note, error) {
 	options := options.Find()
 	type Document struct {
 		ID        primitive.ObjectID `bson:"_id"`
@@ -40,7 +39,7 @@ func (u *noteRepository) GetNotes(kw string, tag string, page int) ([]note.Note,
 		Tags      []string           `bson:"tags"`
 	}
 	var docs []Document
-	var notes []note.Note
+	var notes []entity.Note
 	ctx := context.Background()
 	collection := client.Database("note").Collection("notes")
 	log.Info("start: ", time.Now())
@@ -66,7 +65,7 @@ func (u *noteRepository) GetNotes(kw string, tag string, page int) ([]note.Note,
 	for _, d := range docs {
 		created, _ := time.Parse(time.RFC3339, d.CreatedAt)
 		edited, _ := time.Parse(time.RFC3339, d.CreatedAt)
-		notes = append(notes, note.Note{
+		notes = append(notes, entity.Note{
 			ID:        d.ID.Hex(),
 			Content:   d.Content,
 			Comment:   d.Comment,
@@ -78,7 +77,7 @@ func (u *noteRepository) GetNotes(kw string, tag string, page int) ([]note.Note,
 	return notes, nil
 }
 
-func (u *noteRepository) AddNotes(notes []note.Note) ([]string, error) {
+func (u *noteRepository) AddNotes(notes []entity.Note) ([]string, error) {
 	var res []string
 	type Document struct {
 		Content   string   `bson:"content"`
@@ -111,7 +110,7 @@ func (u *noteRepository) AddNotes(notes []note.Note) ([]string, error) {
 	return res, nil
 }
 
-func (u *noteRepository) UpdateNote(n note.Note) error {
+func (u *noteRepository) UpdateNote(n entity.Note) error {
 	type Document struct {
 		ID       primitive.ObjectID `bson:"_id"`
 		Content  string             `bson:"content"`

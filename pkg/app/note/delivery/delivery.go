@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"sync"
 
+	"note-manager/pkg/app/note/entity"
 	"note-manager/pkg/app/note/usecase"
-	"note-manager/pkg/domain/note"
 	"note-manager/pkg/infra/logger"
 
 	"github.com/gin-gonic/gin"
@@ -79,9 +79,9 @@ func (h *Handler) AddNote(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, err)
 		return
 	}
-	var notes []note.Note
+	var notes []entity.Note
 	for _, r := range reqs {
-		notes = append(notes, note.Note{
+		notes = append(notes, entity.Note{
 			Content: r.Content,
 			Comment: r.Comment,
 			Tags:    r.Tags,
@@ -109,13 +109,13 @@ func (h *Handler) EditNote(ctx *gin.Context) {
 		return
 	}
 	noteID := ctx.Param("id")
-	n := note.Note{
+	n := entity.Note{
 		ID:      noteID,
 		Content: req.Content,
 		Comment: req.Comment,
 		Tags:    req.Tags,
 	}
-	h.Usecase.UpdateNote(n)
+	h.Usecase.EditNote(n)
 	ctx.JSON(http.StatusOK, nil)
 }
 

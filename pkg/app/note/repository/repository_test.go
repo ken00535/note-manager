@@ -2,7 +2,7 @@ package repository
 
 import (
 	"fmt"
-	"note-manager/pkg/domain/note"
+	"note-manager/pkg/app/note/entity"
 	"note-manager/pkg/infra/config"
 	"note-manager/pkg/infra/db"
 	"note-manager/pkg/infra/logger"
@@ -33,7 +33,7 @@ func Test_noteRepository_AddNotes(t *testing.T) {
 	config.Init()
 	db.Init(logger.NewMockLogger())
 	repo := NewNoteRepository()
-	notes := []note.Note{
+	notes := []entity.Note{
 		{
 			Content: "test",
 			Comment: "test",

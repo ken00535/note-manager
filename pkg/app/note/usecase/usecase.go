@@ -3,7 +3,6 @@ package usecase
 import (
 	"note-manager/pkg/app/note/entity"
 	"note-manager/pkg/app/note/repository"
-	"note-manager/pkg/domain/note"
 )
 
 type noteUsecase struct {
@@ -17,15 +16,15 @@ func NewNoteUsecase(repo repository.Repository) Usecase {
 	}
 }
 
-func (u *noteUsecase) GetNotes(kw string, tag string, page int) ([]note.Note, error) {
+func (u *noteUsecase) GetNotes(kw string, tag string, page int) ([]entity.Note, error) {
 	return u.repo.GetNotes(kw, tag, page)
 }
 
-func (u *noteUsecase) AddNotes(notes []note.Note) ([]string, error) {
+func (u *noteUsecase) AddNotes(notes []entity.Note) ([]string, error) {
 	return u.repo.AddNotes(notes)
 }
 
-func (u *noteUsecase) UpdateNote(n note.Note) error {
+func (u *noteUsecase) EditNote(n entity.Note) error {
 	return u.repo.UpdateNote(n)
 }
 
