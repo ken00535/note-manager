@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"note-manager/pkg/app/note/entity"
 	"note-manager/pkg/domain/note"
 	"note-manager/pkg/infra/db"
 	"note-manager/pkg/infra/logger"
@@ -146,4 +147,42 @@ func (u *noteRepository) DeleteNote(id string) error {
 		return err
 	}
 	return nil
+}
+
+func (u *noteRepository) GetTags() ([]entity.Tag, error) {
+	type Doc struct {
+		Name  string `bson:"_id"`
+		Count int
+	}
+	var docs []Doc
+	ctx := context.Background()
+	collection := client.Database("note").Collection("notes")
+	unwindStage := bson.D{
+		{Key: "$unwind", Value: "$tags"},
+	}
+	groupStage := bson.D{
+		{Key: "$group", Value: bson.D{
+			{Key: "_id", Value: "$tags"},
+			{Key: "count", Value: bson.D{
+				{Key: "$sum", Value: 1},
+			}},
+		}},
+	}
+	cursor, err := collection.Aggregate(ctx, mongo.Pipeline{unwindStage, groupStage})
+	if err != nil {
+		log.Error(err)
+		return []entity.Tag{}, err
+	}
+	err = cursor.All(ctx, &docs)
+	if err != nil {
+		return nil, err
+	}
+	var tags []entity.Tag
+	for _, d := range docs {
+		tags = append(tags, entity.Tag{
+			Name:  d.Name,
+			Count: d.Count,
+		})
+	}
+	return tags, nil
 }

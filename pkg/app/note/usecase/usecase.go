@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"note-manager/pkg/app/note/entity"
 	"note-manager/pkg/app/note/repository"
 	"note-manager/pkg/domain/note"
 )
@@ -30,4 +31,8 @@ func (u *noteUsecase) UpdateNote(n note.Note) error {
 
 func (u *noteUsecase) DeleteNote(id string) error {
 	return u.repo.DeleteNote(id)
+}
+
+func (u *noteUsecase) GetTags() ([]entity.Tag, error) {
+	return u.repo.GetTags()
 }

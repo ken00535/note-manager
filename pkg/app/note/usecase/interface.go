@@ -1,6 +1,9 @@
 package usecase
 
-import "note-manager/pkg/domain/note"
+import (
+	"note-manager/pkg/app/note/entity"
+	"note-manager/pkg/domain/note"
+)
 
 // Usecase is usecase
 type Usecase interface {
@@ -8,4 +11,5 @@ type Usecase interface {
 	AddNotes(notes []note.Note) ([]string, error)
 	UpdateNote(note.Note) error
 	DeleteNote(string) error
+	GetTags() ([]entity.Tag, error)
 }

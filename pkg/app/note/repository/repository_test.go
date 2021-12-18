@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"fmt"
 	"note-manager/pkg/domain/note"
 	"note-manager/pkg/infra/config"
 	"note-manager/pkg/infra/db"
@@ -39,4 +40,12 @@ func Test_noteRepository_AddNotes(t *testing.T) {
 		},
 	}
 	repo.AddNotes(notes)
+}
+
+func Test_noteRepository_GetTags(t *testing.T) {
+	config.Init()
+	db.Init(logger.NewMockLogger())
+	repo := NewNoteRepository()
+	tags, _ := repo.GetTags()
+	fmt.Println(tags)
 }

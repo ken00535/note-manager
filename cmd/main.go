@@ -46,6 +46,7 @@ func main() {
 		apiRouteGroup.POST("/notes", deliver.AddNote)
 		apiRouteGroup.PUT("/notes/:id", deliver.EditNote)
 		apiRouteGroup.DELETE("/notes/:id", deliver.DeleteNote)
+		apiRouteGroup.GET("/tags", deliver.GetTags)
 	}
 	var wg sync.WaitGroup
 	wg.Add(2)

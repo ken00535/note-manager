@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"note-manager/pkg/app/note/entity"
 	"note-manager/pkg/domain/note"
 )
 
@@ -10,4 +11,5 @@ type Repository interface {
 	AddNotes(notes []note.Note) ([]string, error)
 	UpdateNote(note.Note) error
 	DeleteNote(id string) error
+	GetTags() ([]entity.Tag, error)
 }

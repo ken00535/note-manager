@@ -125,3 +125,24 @@ func (h *Handler) DeleteNote(ctx *gin.Context) {
 	h.Usecase.DeleteNote(noteID)
 	ctx.JSON(http.StatusOK, nil)
 }
+
+// GetTags get tags
+func (h *Handler) GetTags(ctx *gin.Context) {
+	type Response struct {
+		Name  string `json:"name"`
+		Count int    `json:"count"`
+	}
+	tags, err := h.Usecase.GetTags()
+	if err != nil {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	}
+	var res []Response
+	for _, t := range tags {
+		tag := Response{
+			Name:  t.Name,
+			Count: t.Count,
+		}
+		res = append(res, tag)
+	}
+	ctx.JSON(http.StatusOK, res)
+}
